@@ -21,26 +21,41 @@
             margin: 0;
             padding: 0;
         }
+
+        #rcdStart:focus {
+            animation: blink 0.8s linear infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container w-100  bg-black text-center ">
         <video id="screen" width="100%" height="auto" autoplay></video>
+        <button id="camStart" class="btn btn-lg " type="button"><i class="fa-solid fa-video fs-1 rounded"
+                style="color:white;" onclick="startCam()"></i></button>
         <button id="rcdStart" class="btn btn-lg" type="button"><i class="fa-solid fa-record-vinyl fs-1"
-                style="color:white"></i></button>
-        <button id="rcdStop" class="btn btn-lg" type="button"><i class="fa-solid fa-stop fs-1"
-                style="color:red"></i></button>
+                style="color:red;" onclick="startRecord()"></i></button>
+        <button id="rcdStop" class="btn btn-lg" type="button"><i class="fa-solid fa-stop fs-1" style="color:red;"
+                onclick="stopRecord()"></i></button>
     </div>
-    <!-- <div class="container text-center bg-black  z-1 ">
-        <button id="rcdStart" class="btn btn-lg" type="button"><i class="fa-solid fa-record-vinyl fs-1"
-                style="color:white"></i></button>
-        <button id="rcdStop" class="btn btn-lg" type="button"><i class="fa-solid fa-stop fs-1"
-                style="color:red"></i></button>
-    </div> -->
 
     <script>
         var Vdo_screen = document.getElementById("screen");
+        var Cam_start = document.getElementById("camStart");
         var Rcd_start = document.getElementById("rcdStart");
         var Rcd_stop = document.getElementById("rcdStop");
 
@@ -48,10 +63,11 @@
         var options = { mimeType: "video/webm;codecs=vp9" };
         var recordedChunks = [];
 
-        if (Vdo_screen) {  // if video screen is opened
+        //Start webcam
+        function startCam() {
+            //setting video &audio accessible
             console.log("we have the video");
-            navigator.mediaDevices.getUserMedia({ video: { width: 1920, height: 1080 }, audio: true }) //setting video &audio accessible
-                .then(gotStream)
+            navigator.mediaDevices.getUserMedia({ video: { width: 1920, height: 1080 }, audio: true }).then(gotStream)
                 .catch(function (e) {  // error while opening the video screen
                     if (confirm("An error with camera occured:(" + e.name + ")Do you want to reload?")) {
                         location.reload();  //reload the page
@@ -69,25 +85,25 @@
         }
 
         //Start recording
-        if (Rcd_start) {
-            Rcd_start.addEventListener('click', () => {
-                mediarecorder.start();
-            });
+        function startRecord() {
+            mediarecorder.start();
+            console.log("Recording...")
         }
 
-        // Stop recording
-        if (Rcd_stop) {
-            Rcd_stop.addEventListener("click", () => {
-                mediarecorder.stop();
-            });
-        }
-
-        //store recording 
+        //Store recording 
         function handleDataAvailable(event) {
             if (event.data.size > 0) {
                 recordedChunks.push(event.data);  //media is stored as chunks
                 console.log(event.data);
             }
+        }
+
+        // Stop recording
+        function stopRecord() {
+            mediarecorder.stop();
+            Vdo_screen.pause();
+            Vdo_screen.srcObject = null;
+            console.log("Recording stopped..Video turned off")
         }
 
         //download the recorded video
@@ -98,12 +114,10 @@
             document.body.appendChild(a);   //including the link in document
             a.style = 'display:none';   //hiding the link
             a.href = url; //assign url to the created link
-            a.download = 'test.webm';  //download tthe recording
+            a.download = 'WebCamtTest.webm';  //download tthe recording
             a.click();  //click event on the link
             window.URL.revokeObjectURL(url);  //opening the link
         }
-
-
     </script>
 </body>
 
