@@ -101,8 +101,12 @@
         // Stop recording
         function stopRecord() {
             mediarecorder.stop();
-            Vdo_screen.pause();
-            Vdo_screen.srcObject = null;
+            // Vdo_screen.pause();
+            // Vdo_screen.srcObject = null;
+            const tracks = Vdo_screen.srcObject.getTracks();
+            // tracks[0].stop();
+            tracks.forEach((track) => track.stop());
+            // gotStream(null);
             console.log("Recording stopped..Video turned off")
         }
 
